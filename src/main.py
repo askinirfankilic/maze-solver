@@ -1,12 +1,13 @@
-from src.geometry import Line, Point
+from src.cell import Cell
+from src.geometry import Point
 from src.window import Window
 
 
 def main():
     wnd = Window(500, 500)
-    p1 = Point(250, 250)
-    p2 = Point(250, 150)
-    wnd.draw_line(Line(p1, p2), "red")
+    top_left = Point(100, 100)
+    bottom_right = Point(300, 300)
+    wnd.draw_cell(Cell(), top_left, bottom_right, "red")
     wnd.wait_for_close()
 
 
