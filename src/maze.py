@@ -128,3 +128,8 @@ class Maze:
                     chosen_cell.has_top_wall = False
                     curr.has_bottom_wall = False
                     self._break_walls_r(dir[0], dir[1])
+
+    def _reset_cells_visited(self):
+        for i in self._cells:
+            for j in i:
+                j.visited = False
