@@ -26,6 +26,3 @@ class Window:
 
     def draw_line(self, line, fill_color):
         line.draw(self.canvas, fill_color)
-
-    def draw_cell(self, cell, left_top, right_bottom, fill_color):
-        cell.draw(self.canvas, left_top, right_bottom, fill_color)
