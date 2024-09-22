@@ -20,6 +20,7 @@ class Cell:
         self._x2 = -1
         self._y2 = -1
         self._wnd = wnd
+        self.visited = False
 
     def draw(self, x1, y1, x2, y2, fill_color="black"):
         self._x1 = x1

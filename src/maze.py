@@ -1,10 +1,21 @@
 from src.cell import Cell
 from src.geometry import Point
 import time
+import random
 
 
 class Maze:
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, wnd=None):
+    def __init__(
+        self,
+        x1,
+        y1,
+        num_rows,
+        num_cols,
+        cell_size_x,
+        cell_size_y,
+        wnd=None,
+        seed=None,
+    ):
         self.x1 = x1
         self.y1 = y1
         self.num_rows = num_rows
@@ -14,6 +25,9 @@ class Maze:
         self._wnd = wnd
         self._cells = []
         self._create_cells()
+        self._seed = seed
+        if self._seed is not None:
+            random.seed(self._seed)
 
     def _create_cells(self):
         for i in range(self.num_rows):
@@ -28,6 +42,7 @@ class Maze:
                 self._draw_cell(self._cells[i][j], i, j)
 
         self._break_entrance_and_exit()
+        self._break_walls_r(0, 0)
         self._animate()
 
     def _break_entrance_and_exit(self):
@@ -52,3 +67,64 @@ class Maze:
             return
         self._wnd.redraw()
         time.sleep(1)
+
+    def _break_walls_r(self, i, j):
+        curr = self._cells[i][j]
+        curr.visited = True
+
+        while True:
+            to_visit = []
+
+            possible_directions = 0
+            if j > 0:
+                left = self._cells[i][j - 1]
+                if not left.visited:
+                    to_visit.append((i, j - 1, "left"))
+                    possible_directions += 1
+
+            if j < self.num_cols - 1:
+                right = self._cells[i][j + 1]
+                if not right.visited:
+                    to_visit.append((i, j + 1, "right"))
+                    possible_directions += 1
+
+            if i > 0:
+                top = self._cells[i - 1][j]
+                if not top.visited:
+                    to_visit.append((i - 1, j, "top"))
+                    possible_directions += 1
+
+            if i < self.num_rows - 1:
+                bottom = self._cells[i + 1][j]
+                if not bottom.visited:
+                    to_visit.append((i + 1, j, "bottom"))
+                    possible_directions += 1
+
+            if possible_directions == 0:
+                self._draw_cell(curr, i, j)
+                return
+
+            dir_index = random.randint(0, len(to_visit) - 1)
+            dir = to_visit[dir_index]
+
+            chosen_cell = self._cells[dir[0]][dir[1]]
+            match dir[2]:
+                case "left":
+                    chosen_cell.has_right_wall = False
+                    curr.has_left_wall = False
+                    self._break_walls_r(dir[0], dir[1])
+
+                case "right":
+                    chosen_cell.has_left_wall = False
+                    curr.has_right_wall = False
+                    self._break_walls_r(dir[0], dir[1])
+
+                case "top":
+                    chosen_cell.has_bottom_wall = False
+                    curr.has_top_wall = False
+                    self._break_walls_r(dir[0], dir[1])
+
+                case "bottom":
+                    chosen_cell.has_top_wall = False
+                    curr.has_bottom_wall = False
+                    self._break_walls_r(dir[0], dir[1])
