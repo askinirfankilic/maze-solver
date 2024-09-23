@@ -28,6 +28,7 @@ class Maze:
         self._seed = seed
         if self._seed is not None:
             random.seed(self._seed)
+        self._reset_cells_visited()
 
     def _create_cells(self):
         for i in range(self.num_rows):
@@ -133,3 +134,49 @@ class Maze:
         for i in self._cells:
             for j in i:
                 j.visited = False
+
+    def solve(self):
+        return self._solve_r(0, 0)
+
+    def _solve_r(self, i, j):
+        end = self._cells[self.num_rows - 1][self.num_cols - 1]
+        self._animate()
+        curr = self._cells[i][j]
+        curr.visited = True
+
+        if curr is end:
+            return True
+
+        if j > 0:
+            left = self._cells[i][j - 1]
+            if not left.visited and not left.has_right_wall:
+                curr.draw_move(left)
+                if self._solve_r(i, j - 1):
+                    return True
+                curr.draw_move(left, undo=True)
+
+        if j < self.num_cols - 1:
+            right = self._cells[i][j + 1]
+            if not right.visited and not right.has_left_wall:
+                curr.draw_move(right)
+                if self._solve_r(i, j + 1):
+                    return True
+                curr.draw_move(right, undo=True)
+
+        if i > 0:
+            top = self._cells[i - 1][j]
+            if not top.visited and not top.has_bottom_wall:
+                curr.draw_move(top)
+                if self._solve_r(i - 1, j):
+                    return True
+                curr.draw_move(top, undo=True)
+
+        if i < self.num_rows - 1:
+            bottom = self._cells[i + 1][j]
+            if not bottom.visited and not bottom.has_top_wall:
+                curr.draw_move(bottom)
+                if self._solve_r(i + 1, j):
+                    return True
+                curr.draw_move(bottom, undo=True)
+
+        return False
